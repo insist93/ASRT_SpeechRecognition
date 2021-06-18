@@ -36,11 +36,11 @@ import tensorflow.keras as kr
 import numpy as np
 import random
 
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Dropout, Input, Reshape, BatchNormalization # , Flatten
-from tensorflow.keras.layers import Lambda, TimeDistributed, Activation,Conv2D, MaxPooling2D #, Merge
-from tensorflow.keras import backend as K
-from tensorflow.keras.optimizers import SGD, Adadelta, Adam
+from keras.models import Sequential, Model
+from keras.layers import Dense, Dropout, Input, Reshape, BatchNormalization # , Flatten
+from keras.layers import Lambda, TimeDistributed, Activation,Conv2D, MaxPooling2D #, Merge
+from keras import backend as K
+from keras.optimizers import SGD, Adadelta, Adam
 
 from readdata24 import DataSpeech
 
@@ -54,7 +54,8 @@ class ModelSpeech(): # 语音模型类
 		初始化
 		默认输出的拼音的表示大小是1428，即1427个拼音+1个空白块
 		'''
-		MS_OUTPUT_SIZE = 1428
+		# MS_OUTPUT_SIZE = 1428
+		MS_OUTPUT_SIZE = 1424
 		self.MS_OUTPUT_SIZE = MS_OUTPUT_SIZE # 神经网络最终输出的每一个字符向量维度的大小
 		#self.BATCH_SIZE = BATCH_SIZE # 一次训练的batch
 		self.label_max_string_length = 64
@@ -211,7 +212,7 @@ class ModelSpeech(): # 语音模型类
 		加载模型参数
 		'''
 		self._model.load_weights(filename)
-		#self.base_model.load_weights(filename + '.base')
+		self.base_model.load_weights(filename + '.base')
 
 	def SaveModel(self,filename = abspath + 'model_speech/m'+ModelName+'/speech_model'+ModelName,comment=''):
 		'''
@@ -244,10 +245,13 @@ class ModelSpeech(): # 语音模型类
 			data_count = num_data
 		
 		try:
+			random.seed(8)
 			ran_num = random.randint(0,num_data - 1) # 获取一个随机数
 			
 			words_num = 0
 			word_error_num = 0
+			wrong_num=0
+			wrong_corpus=0
 			
 			nowtime = time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()))
 			if(out_report == True):
@@ -274,6 +278,8 @@ class ModelSpeech(): # 语音模型类
 				if(edit_distance <= words_n): # 当编辑距离小于等于句子字数时
 					word_error_num += edit_distance # 使用编辑距离作为错误字数
 				else: # 否则肯定是增加了一堆乱七八糟的奇奇怪怪的字
+					wrong_corpus+=1
+					wrong_num += words_n
 					word_error_num += words_n # 就直接加句子本来的总字数就好了
 				
 				if((i % io_step_print == 0 or i == data_count - 1) and show_ratio == True):
@@ -296,7 +302,11 @@ class ModelSpeech(): # 语音模型类
 			#print('*[测试结果] 语音识别 ' + str_dataset + ' 集语音单字错误率：', word_error_num / words_num * 100, '%')
 			print('*[Test Result] Speech Recognition ' + str_dataset + ' set word error ratio: ', word_error_num / words_num * 100, '%')
 			if(out_report == True):
-				txt += '*[测试结果] 语音识别 ' + str_dataset + ' 集语音单字错误率： ' + str(word_error_num / words_num * 100) + ' %'
+				txt += '*[测试结果] 语音识别 ' + str_dataset + ' 集语音单字错误率： ' + str(word_error_num / words_num * 100) + ' %\n'
+				txt += f'编辑距离大于句子长度的数量：{wrong_corpus}\n'
+				txt += f'编辑距离大于句子长度的总字数：{wrong_num}\n'
+				txt += f'编辑距离计算的的总错误字数：{word_error_num}\n'
+				txt += f'总数量：{words_num}\n'
 				txt_obj.write(txt)
 				txt = ''
 				txt_obj.close()
@@ -322,7 +332,7 @@ class ModelSpeech(): # 语音模型类
 		
 		
 		base_pred = self.base_model.predict(x = x_in)
-		
+
 		#print('base_pred:\n', base_pred)
 		
 		#y_p = base_pred
