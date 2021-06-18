@@ -268,7 +268,10 @@ class DataSpeech():
 		符号转为数字
 		'''
 		if(symbol != ''):
-			return self.list_symbol.index(symbol)
+			if symbol not in self.list_symbol:
+				return 9999		# OOV
+			else:
+				return self.list_symbol.index(symbol)
 		return self.SymbolNum
 	
 	def NumToVector(self,num):

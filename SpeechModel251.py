@@ -36,11 +36,11 @@ import tensorflow.keras as kr
 import numpy as np
 import random
 
-from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, Input, Reshape, BatchNormalization # , Flatten
-from keras.layers import Lambda, TimeDistributed, Activation,Conv2D, MaxPooling2D #, Merge
-from keras import backend as K
-from keras.optimizers import SGD, Adadelta, Adam
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Dense, Dropout, Input, Reshape, BatchNormalization # , Flatten
+from tensorflow.keras.layers import Lambda, TimeDistributed, Activation,Conv2D, MaxPooling2D #, Merge
+from tensorflow.keras import backend as K
+from tensorflow.keras.optimizers import SGD, Adadelta, Adam
 
 from readdata24 import DataSpeech
 
@@ -212,7 +212,7 @@ class ModelSpeech(): # 语音模型类
 		加载模型参数
 		'''
 		self._model.load_weights(filename)
-		self.base_model.load_weights(filename + '.base')
+		# self.base_model.load_weights(filename + '.base')
 
 	def SaveModel(self,filename = abspath + 'model_speech/m'+ModelName+'/speech_model'+ModelName,comment=''):
 		'''
@@ -438,7 +438,7 @@ if(__name__=='__main__'):
 	
 	system_type = plat.system() # 由于不同的系统的文件路径表示不一样，需要进行判断
 	if(system_type == 'Windows'):
-		datapath = 'E:\\语音数据集'
+		datapath = r'D:\05_github_demo\02_datasets'
 		modelpath = modelpath + '\\'
 	elif(system_type == 'Linux'):
 		datapath =  abspath + 'dataset'
@@ -451,13 +451,13 @@ if(__name__=='__main__'):
 	ms = ModelSpeech(datapath)
 	
 	
-	#ms.LoadModel(modelpath + 'm251/speech_model251_e_0_step_100000.h5')
-	ms.TrainModel(datapath, epoch = 50, batch_size = 16, save_step = 500)
+	ms.LoadModel(modelpath + 'v0_6_1/speech_model251_e_0_step_625000.model')
+	# ms.TrainModel(datapath, epoch = 50, batch_size = 16, save_step = 500)
 	
 	#t1=time.time()
 	#ms.TestModel(datapath, str_dataset='train', data_count = 128, out_report = True)
 	#ms.TestModel(datapath, str_dataset='dev', data_count = 128, out_report = True)
-	#ms.TestModel(datapath, str_dataset='test', data_count = 128, out_report = True)
+	ms.TestModel(datapath, str_dataset='test', data_count = -1, out_report = True)
 	#t2=time.time()
 	#print('Test Model Time Cost:',t2-t1,'s')
 	#r = ms.RecognizeSpeech_FromFile('E:\\语音数据集\\ST-CMDS-20170001_1-OS\\20170001P00241I0053.wav')

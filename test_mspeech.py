@@ -52,7 +52,8 @@ if(not os.path.exists(modelpath)): # 判断保存模型的目录是否存在
 
 system_type = plat.system() # 由于不同的系统的文件路径表示不一样，需要进行判断
 if(system_type == 'Windows'):
-	datapath = 'D:\\SpeechData'
+	# datapath = 'D:\\SpeechData'
+	datapath = r'D:\05_github_demo\02_datasets'
 	modelpath = modelpath + '\\'
 elif(system_type == 'Linux'):
 	datapath = 'dataset'
@@ -64,7 +65,8 @@ else:
 
 ms = ModelSpeech(datapath)
 
-ms.LoadModel(modelpath + 'm251/speech_model251_e_0_step_42500.h5')
+# ms.LoadModel(modelpath + 'm251/speech_model251_e_0_step_42500.h5')
+ms.LoadModel(modelpath + 'v0_6_1/speech_model251_e_0_step_625000.model')
 
 ms.TestModel(datapath, str_dataset='test', data_count = 128, out_report = True)
 
